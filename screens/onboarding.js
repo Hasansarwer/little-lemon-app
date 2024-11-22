@@ -1,22 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
     Text, 
     View, 
-    Button,
+    TouchableOpacity,
     TextInput,
-    Image
+    Image,
+    StyleSheet
  } from "react-native";
 import { ProgressBar, MD3Colors } from "react-native-paper";
-import PagerView from 'react-native-pager-view';
+// import PagerView from 'react-native-pager-view';
 
 const Onboarding = ({navigation}) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [currentPage, setCurrentPage] = useState(0);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+    useEffect(() => {
+        if (name.length > 0 && email.length > 0) {
+            setIsButtonDisabled(false);
+        } else {
+            setIsButtonDisabled(true);
+        }
+    }, [name, email]);
 
     return (
-        <PagerView style={{ flex: 1 }} initialPage={0} onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}>
+        // <PagerView style={{ flex: 1 }} initialPage={0} onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}>
             <View key="1" style={{ flex: 1,  alignItems: "center"}}>
                 <View style={{height: 100, width: "100%", flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "#dee3e9" }}>
                     <Image source={require("../assets/little-lemon-logo-grey.png")} style={{ width: 50, height: 60 }} />
@@ -39,42 +47,40 @@ const Onboarding = ({navigation}) => {
                     onChangeText={(text) => setEmail(text)}
                     style={{ width: "80%", marginVertical: 10, padding: 10, borderColor: MD3Colors.grey500, borderWidth: 1, borderRadius: 5 }}
                 />
+                {/* <Button style={{backgroundColor: '#fff', width: '25%',borderRadius:5}} title="Next" onPress={() => setCurrentPage(1)} /> */}
+                <View style={{ width: "100%", flexDirection: "row", justifyContent: "flex-end", marginTop: 50, backgroundColor: "#f0f0f0" }}>
+                    <TouchableOpacity 
+                    // style={{ backgroundColor: "#cbd2d9", margin:30, paddingHorizontal: 20, paddingVertical:10, borderRadius: 5 }} 
+                    style={[
+                        styles.button,
+                        isButtonDisabled && styles.buttonDisabled, // Apply disabled styling
+                    ]}
+                    disabled={isButtonDisabled} 
+                    // onPress={() => setCurrentPage(1)}
+                    >
+                        <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: "center" }} >Next</Text>
+                    </TouchableOpacity>
                 </View>
-                <View style={{height: 100, width: "100%",  backgroundColor: "#dee3e9" }}>
-                    <Button style={{backgroundColor: '#cbd2d9'}} title="Next" onPress={() => setCurrentPage(1)} />
                 </View>
+                
             </View>
-            <View key="2" style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                {/* <Image source={require("../assets/onboarding-2.png")} style={{ width: 200, height: 200 }} /> */}
-                <Text style={{ fontSize: 24, fontWeight: "bold", textAlign: "center" }}>Create an Account</Text>
-                <Text style={{ fontSize: 16, textAlign: "center" }}>Sign up to get started</Text>
-                <TextInput
-                    placeholder="Name"
-                    value={name}
-                    onChangeText={(text) => setName(text)}
-                    style={{ width: "80%", marginVertical: 10, padding: 10, borderColor: MD3Colors.grey500, borderWidth: 1, borderRadius: 5 }}
-                />
-                <TextInput
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={(text) => setEmail(text)}
-                    style={{ width: "80%", marginVertical: 10, padding: 10, borderColor: MD3Colors.grey500, borderWidth: 1, borderRadius: 5 }}
-                />
-                <TextInput
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={(text) => setPassword(text)}
-                    style={{ width: "80%", marginVertical: 10, padding: 10, borderColor: MD3Colors.grey500, borderWidth: 1, borderRadius: 5 }}
-                />
-            </View>
-            <View key="3" style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                {/* <Image source={require(  "../assets/onboarding-3.png")} style={{ width: 200, height: 200 }} /> */}
-                <Text style={{ fontSize: 24, fontWeight: "bold", textAlign: "center" }}>All Set!</Text>
-                <Text style={{ fontSize: 16, textAlign: "center" }}>You're ready to go!</Text>
-                <Button title="Get Started" onPress={() => alert("Get Started")} />
-            </View>
-        </PagerView>
+            
+            
+        // </PagerView>
     );
 }
+
+const styles = StyleSheet.create({
+    button: {
+        backgroundColor: "#cbd2d9",
+        margin: 30,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 5,
+    },
+    buttonDisabled: {
+        backgroundColor: "#aaa",
+    },
+});
 
 export default Onboarding;
