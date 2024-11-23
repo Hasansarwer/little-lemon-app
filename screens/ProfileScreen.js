@@ -114,14 +114,14 @@ export default function ProfileScreen(name, email) {
                     <Text style={{textAlign: 'center'}}>Log out</Text>
                 </TouchableOpacity>
             </View>
-            <View style={{width: '90%', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{width: '100%', flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View style={{width: '50%'}}>
                     <TouchableOpacity style={{backgroundColor: "#fff", margin: 20, borderColor: "olive", padding: 10, borderRadius: 5, marginTop: 20}}>
                         <Text style={{textAlign: 'center'}}>Discard changes</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{width: '50%'}}>
-                    <TouchableOpacity style={{backgroundColor: "olive", padding: 10, borderRadius: 5, marginTop: 20}}>
+                    <TouchableOpacity style={{backgroundColor: "olive", padding: 10, borderRadius: 5, margin: 20}}>
                         <Text style={{textAlign: 'center', color: 'white'}}>Save changes</Text>
                     </TouchableOpacity>
                 </View>
