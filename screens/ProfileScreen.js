@@ -2,12 +2,13 @@ import * as React from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';  
 import { Checkbox } from 'react-native-paper';
 import { MaskedTextInput } from "react-native-mask-text";
+import Avatar from '../component/Avatar';
 
 export default function ProfileScreen(name, email) {
     const [profileInfo, setProfileInfo] = React.useState({
-        avatar: '',
-        firstName: name,
-        lastName: '',
+        avatar: null,
+        firstName: null,
+        lastName: null,
         email: email,
         phone: '',
         orderStatus: false,
@@ -27,16 +28,17 @@ export default function ProfileScreen(name, email) {
             contentContainerStyle ={styles.container}
             showsVerticalScrollIndicator={false}
         >
-            <View style={{width: '100%', height: 60, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#dee3e9', paddingTop:12}}>
+            <View style={{width: '100%', height: 68, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#dee3e9', paddingTop:20, paddingHorizontal: 10}}>
                 <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
                     <Image source={require("../assets/little-lemon-logo-grey.png")} style={{ width: 30, height: 36 }} />
                     <Text style={{fontSize: 20, padding: 10}}>LITTLE LEMON</Text>
                 </View>
-                <Image source={require("../assets/avatar.png")} style={{ width: 30, height: 30, borderRadius: 15, marginRight: 10 }} />
+                <Avatar avatar={profileInfo?.avatar} firstName={profileInfo?.firstName} lastName={profileInfo?.lastName} big={false} />
             </View>
             <Text style={styles.title}>Avatar </Text>
-            <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
-                <Image source={require("../assets/avatar.png")} style={{ width: 100, height: 100, borderRadius: 50, margin: 20 }} />
+            <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingLeft:20}}>
+                {/* <Image source={require("../assets/avatar.png")} style={{ width: 100, height: 100, borderRadius: 50, margin: 20 }} /> */}
+                <Avatar avatar={profileInfo?.avatar} firstName={profileInfo?.firstName} lastName={profileInfo?.lastName} big={true} />
                 <TouchableOpacity style={{backgroundColor: "olive", borderColor: "yellow", padding: 10, borderRadius: 5, margin: 20}}>
                     <Text style={{textAlign: 'center', color: 'white'}}>Change</Text>
                 </TouchableOpacity>
