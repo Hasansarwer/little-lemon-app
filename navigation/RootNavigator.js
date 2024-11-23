@@ -34,9 +34,22 @@ export default function RootNavigator() {
     return (
         <Stack.Navigator>
             {isOnboarded ? (
-                <Stack.Screen name="Profile" component={ProfileScreen} />
+                <>
+                <Stack.Screen name="Profile" options={{ headerShown: false }} component={ProfileScreen} />
+                <Stack.Screen name="Home" component={HomeScreen} />
+                </>
             ) : (
-                <Stack.Screen name="Onboarding" component={Onboarding} />
+                <Stack.Screen
+                    name="Onboarding"
+                    options={{ headerShown: false }} // Hide header if needed
+                >
+                    {(props) => (
+                        <Onboarding
+                            {...props}
+                            completeOnboarding={completeOnboarding}
+                        />
+                    )}
+                </Stack.Screen>
             )}
         </Stack.Navigator>
     );

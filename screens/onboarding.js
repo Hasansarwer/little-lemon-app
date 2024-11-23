@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { 
     Text, 
@@ -10,10 +11,17 @@ import {
 import { ProgressBar, MD3Colors } from "react-native-paper";
 // import PagerView from 'react-native-pager-view';
 
-const Onboarding = ({navigation}) => {
+const Onboarding = ({navigation, completeOnboarding}) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+    const handaleNext = async () => {
+        await AsyncStorage.setItem('name', name);
+        await AsyncStorage.setItem('email', email);
+        completeOnboarding();
+        // navigation.navigate('ProfileScreen', {name: name, email: email});
+    }
 
     useEffect(() => {
         if (name.length > 0 && email.length > 0) {
@@ -56,7 +64,7 @@ const Onboarding = ({navigation}) => {
                         isButtonDisabled && styles.buttonDisabled, // Apply disabled styling
                     ]}
                     disabled={isButtonDisabled} 
-                    // onPress={() => setCurrentPage(1)}
+                    onPress={() => handaleNext()}
                     >
                         <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: "center" }} >Next</Text>
                     </TouchableOpacity>
