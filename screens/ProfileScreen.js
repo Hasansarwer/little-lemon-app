@@ -4,7 +4,7 @@ import { Checkbox } from 'react-native-paper';
 import { MaskedTextInput } from "react-native-mask-text";
 import Avatar from '../component/Avatar';
 
-export default function ProfileScreen(name, email) {
+export default function ProfileScreen({name, email, logOut}) {
     const [profileInfo, setProfileInfo] = React.useState({
         avatar: null,
         firstName: null,
@@ -109,7 +109,7 @@ export default function ProfileScreen(name, email) {
             <View style={{width: '90%'}}>
                 <TouchableOpacity 
                     style={{backgroundColor: "gold", borderColor: "yellow", padding: 10, borderRadius: 5, marginTop: 20}}
-                    onPress={Alert.alert('Log Out')}
+                    onPress={() => logOut()}
                     >
                     <Text style={{textAlign: 'center'}}>Log out</Text>
                 </TouchableOpacity>

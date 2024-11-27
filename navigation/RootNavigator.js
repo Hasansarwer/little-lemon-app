@@ -28,6 +28,13 @@ export default function RootNavigator() {
         setIsOnboarded(true);
     };
 
+    const logOut = async () => {
+        await AsyncStorage.removeItem('onboardingComplete');
+        await AsyncStorage.removeItem('name');
+        await AsyncStorage.removeItem('email');
+        setIsOnboarded(false);
+    };
+
     if (!isLoaded) {
         return <SplashScreen />;
     }
@@ -35,8 +42,20 @@ export default function RootNavigator() {
         <Stack.Navigator>
             {isOnboarded ? (
                 <>
-                <Stack.Screen name="Profile" options={{ headerShown: false }} component={ProfileScreen} />
                 <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen 
+                    name="Profile" 
+                    options={{ headerShown: false }} 
+                    >
+                       
+                    {(props) => (
+                        <ProfileScreen 
+                            {...props} 
+                            logOut = {logOut}
+                            />
+                    )}
+                </Stack.Screen> 
+                
                 </>
             ) : (
                 <Stack.Screen
