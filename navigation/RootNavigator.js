@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Onboarding from '../screens/onboarding';
 import HomeScreen from '../screens/HomeScreen';
@@ -23,53 +24,60 @@ export default function RootNavigator() {
         checkOnboardingStatus();
     }, []);
 
-    const completeOnboarding = async () => {
-        await AsyncStorage.setItem('onboardingComplete', 'true');
-        setIsOnboarded(true);
+    const completeOnboarding = async (navigation) => {
+        try {
+            await AsyncStorage.setItem('onboardingComplete', 'true');
+            setIsOnboarded(true);
+            navigation.navigate('Home');
+        } catch (error) {
+            console.error('Error saving onboarding data: ', error);
+        }
+        
     };
 
-    const logOut = async () => {
+    const logOut = async (navigation) => {
         await AsyncStorage.removeItem('onboardingComplete');
         await AsyncStorage.removeItem('name');
         await AsyncStorage.removeItem('email');
         setIsOnboarded(false);
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'Onboarding' }],
+            })
+        );
     };
 
     if (!isLoaded) {
         return <SplashScreen />;
     }
     return (
-        <Stack.Navigator>
-            {isOnboarded ? (
-                <>
-                <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen 
-                    name="Profile" 
-                    options={{ headerShown: false }} 
-                    >
-                       
-                    {(props) => (
-                        <ProfileScreen 
-                            {...props} 
-                            logOut = {logOut}
-                            />
-                    )}
-                </Stack.Screen> 
-                
-                </>
-            ) : (
-                <Stack.Screen
-                    name="Onboarding"
-                    options={{ headerShown: false }} // Hide header if needed
+        <Stack.Navigator initialRouteName={isOnboarded ? "Home" : "Onboarding"}>
+            <Stack.Screen name="Home" options={{ headerShown: false }} component={HomeScreen} />
+            <Stack.Screen 
+                name="Profile" 
+                options={{ headerShown: false }} 
                 >
-                    {(props) => (
-                        <Onboarding
-                            {...props}
-                            completeOnboarding={completeOnboarding}
-                        />
-                    )}
-                </Stack.Screen>
-            )}
+                     
+                {(props) => (
+                    <ProfileScreen 
+                        {...props} 
+                        logOut = {()=> logOut(props.navigation)}
+                    />
+                )}
+            </Stack.Screen> 
+            <Stack.Screen
+                name="Onboarding"
+                options={{ headerShown: false }} // Hide header if needed
+            >
+                {(props) => (
+                    <Onboarding
+                     {...props}
+                    completeOnboarding={()=>completeOnboarding(props.navigation)}
+                    />
+                )}
+            </Stack.Screen>
+            
         </Stack.Navigator>
     );
 }

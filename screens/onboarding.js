@@ -9,79 +9,122 @@ import {
     StyleSheet
  } from "react-native";
 
-// import PagerView from 'react-native-pager-view';
-
-const Onboarding = ({navigation, completeOnboarding}) => {
+const Onboarding = ({ navigation, completeOnboarding }) => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
-    const handaleNext = async () => {
-        await AsyncStorage.setItem('name', name);
-        await AsyncStorage.setItem('email', email);
-        // navigation.navigate('Home');
-        completeOnboarding();
-        
-        // navigation.navigate('ProfileScreen', {name: name, email: email});
-    }
+    const handleNext = async () => {
+        try {
+            // Save name and email in AsyncStorage
+            await AsyncStorage.setItem('name', name);
+            await AsyncStorage.setItem('email', email);
+            completeOnboarding(); // Call the completion function to move to the next screen
+        } catch (error) {
+            console.error("Error saving onboarding data: ", error);
+        }
+    };
 
     useEffect(() => {
-        if (name.length > 0 && email.length > 0) {
-            setIsButtonDisabled(false);
-        } else {
-            setIsButtonDisabled(true);
-        }
+        // Enable or disable the Next button based on input validation
+        setIsButtonDisabled(!(name.length > 0 && email.length > 0));
     }, [name, email]);
 
     return (
-        // <PagerView style={{ flex: 1 }} initialPage={0} onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}>
-            <View key="1" style={{ flex: 1,  alignItems: "center", alignContent: "space-between"}}>
-                <View style={{height: 100, width: "100%", flexDirection: "row", justifyContent: "center", alignItems: "center", backgroundColor: "#dee3e9" }}>
-                    <Image source={require("../assets/Logo.png")} style={{ width: 185, height: 40 }} />
-                </View>
-                <View style={{flex: 1, alignItems: "center", width: "100%", backgroundColor: "#cbd2d9", alignContent: 'space-between' }}>
-                {/* <Image source={require("../assets/onboarding-1.png")} style={{ width: 200, height: 200 }} /> */}
-                    <Text style={{ fontSize: 20, fontWeight: "bold", textAlign: "center", paddingTop: 30 }}>Let us get to know you</Text>
-                    <View style={{width: '100%', alignItems: 'center'}}>
-                    <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: "center", marginTop: 30 }}>First Name</Text>
+        <View style={{ flex: 1, alignItems: "center", alignContent: "space-between" }}>
+            <View style={styles.header}>
+                <Image source={require("../assets/Logo.png")} style={styles.logo} />
+            </View>
+            <View style={styles.content}>
+                <Text style={styles.title}>Let us get to know you</Text>
+
+                <View style={styles.inputContainer}>
+                    <Text style={styles.label}>First Name</Text>
                     <TextInput
                         placeholder="Name"
                         keyboardType="default"
                         value={name}
                         onChangeText={(text) => setName(text)}
-                        style={{ width: "80%", marginVertical: 10, padding: 10, borderColor: 'gray', borderWidth: 1, borderRadius: 5 }}
+                        style={styles.input}
                     />
-                    <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: "center" }}>Email</Text>
+
+                    <Text style={styles.label}>Email</Text>
                     <TextInput
                         placeholder="Email"
                         keyboardType="email-address"
                         value={email}
                         onChangeText={(text) => setEmail(text)}
-                        style={{ width: "80%", marginVertical: 10, padding: 10, borderColor: 'gray', borderWidth: 1, borderRadius: 5 }}
+                        style={styles.input}
                     />
-                    {/* <Button style={{backgroundColor: '#fff', width: '25%',borderRadius:5}} title="Next" onPress={() => setCurrentPage(1)} /> */}
-                    </View>
                 </View>
-                <View style={{ width: "100%", flexDirection: "row", justifyContent: "flex-end", backgroundColor: "#f0f0f0" }}>
-                    <TouchableOpacity 
-                        // style={{ backgroundColor: "#cbd2d9", margin:30, paddingHorizontal: 20, paddingVertical:10, borderRadius: 5 }} 
-                        style={[
+            </View>
+            <View style={styles.footer}>
+                <TouchableOpacity
+                    style={[
                         styles.button,
                         isButtonDisabled && styles.buttonDisabled, // Apply disabled styling
-                        ]}
-                        disabled={isButtonDisabled} 
-                        onPress={() => handaleNext()}
-                        >
-                        <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: "center" }} >Next</Text>
-                    </TouchableOpacity>
-                </View>
-                
-            </View>  
-        // </PagerView>
+                    ]}
+                    disabled={isButtonDisabled}
+                    onPress={()=>handleNext()} // Correct function call
+                >
+                    <Text style={styles.buttonText}>Next</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    header: {
+        height: 100,
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#dee3e9",
+    },
+    logo: {
+        width: 185,
+        height: 40,
+    },
+    content: {
+        flex: 1,
+        alignItems: "center",
+        width: "100%",
+        backgroundColor: "#cbd2d9",
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: "bold",
+        textAlign: "center",
+        paddingTop: 30,
+        color: '#495E57',
+    },
+    inputContainer: {
+        width: '100%',
+        alignItems: 'center',
+    },
+    label: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: "center",
+        marginTop: 30,
+        color: '#495E57',
+    },
+    input: {
+        width: "80%",
+        marginVertical: 10,
+        padding: 10,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 5,
+    },
+    footer: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        backgroundColor: "#f0f0f0",
+    },
     button: {
         backgroundColor: "#cbd2d9",
         margin: 30,
@@ -91,6 +134,12 @@ const styles = StyleSheet.create({
     },
     buttonDisabled: {
         backgroundColor: "#aaa",
+    },
+    buttonText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: "center",
+        color: '#495E57',
     },
 });
 
