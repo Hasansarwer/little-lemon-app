@@ -6,7 +6,8 @@ import {
     TouchableOpacity,
     TextInput,
     Image,
-    StyleSheet
+    StyleSheet,
+    ScrollView
  } from "react-native";
 
 const Onboarding = ({ navigation, completeOnboarding }) => {
@@ -31,7 +32,10 @@ const Onboarding = ({ navigation, completeOnboarding }) => {
     }, [name, email]);
 
     return (
-        <View style={{ flex: 1, alignItems: "center", alignContent: "space-between" }}>
+        <ScrollView 
+        contentContainerStyle ={styles.container}
+        showsVerticalScrollIndicator={false}
+        >
             <View style={styles.header}>
                 <Image source={require("../assets/Logo.png")} style={styles.logo} />
             </View>
@@ -70,11 +74,17 @@ const Onboarding = ({ navigation, completeOnboarding }) => {
                     <Text style={styles.buttonText}>Next</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+            </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        // justifyContent: 'center',
+        backgroundColor: '#EDEFEE'
+    },
     header: {
         height: 100,
         width: "100%",

@@ -1,37 +1,62 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { 
     View, 
     Text, 
     Image, 
     StyleSheet, 
-    TouchableOpacity, 
-    Animated, 
-    TextInput,
-    Dimensions
+    TouchableOpacity,
+    Dimensions,
+    ScrollView,
+    FlatList
  } from 'react-native';  
-import { Icon, Searchbar } from 'react-native-paper';
+import { Chip, Icon, Searchbar } from 'react-native-paper';
 
 export default function HomeScreen({navigation}) {
     const [isSearchVisible, setSearchVisible] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const animatedWidth = useRef(new Animated.Value(0)).current;
-    const animatedOpacity = useRef(new Animated.Value(0)).current;
+    const [menuItems, setMenuItems] = useState([]);
     const { width } = Dimensions.get('window');
+
+    const API_URL = 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
+    const categories = ["Starters", "Main", "Desserts", "Drinks"];
+
+    const Item = ({name, price, description, image}) => (
+        <View style={styles.item}>
+            <View style={[styles.description, {width: width-120}]} >
+                <Text style= {styles.name}>{name}</Text>
+                <Text numberOfLines={2} style = {styles.description}>{description}</Text>
+                <Text style = {styles.price}>${price}</Text>
+            </View>
+            <View style={styles.imgContainer}>
+                <Image source={{ uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${image}?raw=true`}} style={{ width: 100, height: 100 }} />
+            </View>
+        </View>
+    );
+
     const handleSearchToggle = () => {
-        setSearchVisible(!isSearchVisible);
-        Animated.timing(animatedWidth, {
-            toValue: isSearchVisible ? 0 : width - 40,
-            duration: 300,
-            useNativeDriver: false
-        }).start();
-        Animated.timing(animatedOpacity, {
-            toValue: isSearchVisible ? 0 : 1,
-            duration: 300,
-            useNativeDriver: false
-        }).start();
+        setSearchVisible(!isSearchVisible);        
     };
+
+    const fetchData = async() =>{
+        try{
+            const response = await fetch(API_URL);
+            const json = await response.json();
+            setMenuItems(json.menu);
+        }catch(error){
+            console.error(error);
+        }
+    }
+
+    useEffect(()=>{
+            fetchData();
+    },[]);
+
     return (
-        <View style ={{flex:1, alignItems: 'center', alignContent: "space-between"}}>
+        <View 
+        style ={styles.container}
+        // showsVerticalScrollIndicator={false}
+        >
+            
             <View style={{height: 100, width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", backgroundColor: "white", paddingTop: 20 }}>
                 <View style={{ width: 60, height: 60 }}></View>
                     <Image source={require("../assets/Logo.png")} style={{ width: 185, height: 44 }} />
@@ -40,9 +65,9 @@ export default function HomeScreen({navigation}) {
                     </TouchableOpacity>
             </View>
             <View style={styles.hero}>
+                <Text style = {styles.display}>Little Lemon</Text>
                 <View style={styles.direct}>
                 <View style={styles.text}>
-                    <Text style = {styles.display}>Little lemon</Text>
                     <Text style = {styles.subTitle}>Chicago</Text>
                     <Text style = {styles.paragraph}>We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.</Text>
                 </View>
@@ -60,24 +85,76 @@ export default function HomeScreen({navigation}) {
                 />
                 
             </View>
-            
-        </View>
+            <View style={{borderBottomWidth: 2, borderColor: 'white', paddingBottom: 20}}>
+            <Text style={styles.categoryTitle}>ORDER FOR DELIVERY!</Text>
+            <View style={styles.categoryContainer}>
+                {categories.map((category, index) => (
+                    <Chip 
+                    key={index} 
+                    style={{margin: 8, 
+                        alignItems: 'center', 
+                        backgroundColor: 'white', 
+                        fontSize: 18, 
+                        color: '#F4CE14'
+                    }}>
+                        <Text style={{fontSize:18, color: '#495E57'}}>{category}</Text> </Chip>
+                ))}
+            </View>
+            </View>
+            <FlatList
+                data={menuItems}
+                renderItem={({item}) => <Item
+                    name = {item.name}
+                    price = {item.price}
+                    image={item.image}
+                    description={item.description}
+                     />
+                }
+                />
+            </View>
     )
 }
 
 const styles = StyleSheet.create({
-    constainer: {
+    container: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#dee3e9'
+        // justifyContent: 'center',
+        backgroundColor: '#EDEFEE'
+    },
+    item:{
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: '#495E57',
+        paddingVertical: 10
+    },
+    name:{
+        fontSize:18,
+        fontWeight: 'bold',
+        paddingVertical: 10
+    },
+    description:{
+        fontSize: 16,
+        color: '#495E57'
+    },
+    price:{
+        fontSize: 18,
+        fontWeight: 'bold',
+        paddingVertical: 10,
+        color: '#495E57'
+    },
+    categoryContainer:{
+        height: 50,
+        justifyContent: 'flex-start',
+        backgroundColor: '#EDEFEE',
+        flexDirection: 'row'
     },
     search: {
         alignSelf: 'center',
-        marginTop: 30,
+        marginTop: 15,
         height: 50,
         borderRadius: 20,
-        backgroundColor: 'white'
+        backgroundColor: '#EDEFEE',
     },
     hero: {
         width: '100%',
@@ -90,34 +167,42 @@ const styles = StyleSheet.create({
     direct: {
         flexDirection: 'row',
         // justifyContent: 'space-around',
-        padding: 10
     },
     display: {
-        fontSize: 40,
+        fontSize: 64,
         fontWeight: 'bold',
         color: '#F4CE14',
-        marginTop: 20,
+        marginLeft: 10,
     },
     subTitle: {
         fontSize: 24,
         fontWeight: 'medium',
-        color: 'white'
+        color: 'white',
+        marginLeft: 10,
+    },
+    categoryTitle: {
+        alignSelf: 'flex-start',
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginTop: 20,
+        marginLeft: 20
     },
     paragraph: {
-        fontSize: 16,
+        fontSize: 18,
         color: 'white',
-        maxWidth: 210,
+        maxWidth: 200,
         lineHeight: 24,
-        marginTop: 20
+        marginTop: 20,
+        marginLeft: 10,
     },
     heroImage: {
-        width: 140,
+        width: 160,
         height: 170,
-        marginTop: 30,
         borderRadius: 16
     },
     img: {
-        width: 140,
+        width: 160,
         height: 170,
+        marginTop: 0,
     }
 })
