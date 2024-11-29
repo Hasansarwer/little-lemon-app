@@ -1,7 +1,35 @@
-import * as React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';  
+import React, {useRef, useState} from 'react';
+import { 
+    View, 
+    Text, 
+    Image, 
+    StyleSheet, 
+    TouchableOpacity, 
+    Animated, 
+    TextInput,
+    Dimensions
+ } from 'react-native';  
+import { Icon, Searchbar } from 'react-native-paper';
 
 export default function HomeScreen({navigation}) {
+    const [isSearchVisible, setSearchVisible] = useState(false);
+    const [searchText, setSearchText] = useState('');
+    const animatedWidth = useRef(new Animated.Value(0)).current;
+    const animatedOpacity = useRef(new Animated.Value(0)).current;
+    const { width } = Dimensions.get('window');
+    const handleSearchToggle = () => {
+        setSearchVisible(!isSearchVisible);
+        Animated.timing(animatedWidth, {
+            toValue: isSearchVisible ? 0 : width - 40,
+            duration: 300,
+            useNativeDriver: false
+        }).start();
+        Animated.timing(animatedOpacity, {
+            toValue: isSearchVisible ? 0 : 1,
+            duration: 300,
+            useNativeDriver: false
+        }).start();
+    };
     return (
         <View style ={{flex:1, alignItems: 'center', alignContent: "space-between"}}>
             <View style={{height: 100, width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", backgroundColor: "white", paddingTop: 20 }}>
@@ -11,7 +39,8 @@ export default function HomeScreen({navigation}) {
                         <Image source={require("../assets/Profile.png")} style={{ width: 60, height: 60 }} />
                     </TouchableOpacity>
             </View>
-            <View style={[styles.hero, styles.direct]}>
+            <View style={styles.hero}>
+                <View style={styles.direct}>
                 <View style={styles.text}>
                     <Text style = {styles.display}>Little lemon</Text>
                     <Text style = {styles.subTitle}>Chicago</Text>
@@ -20,12 +49,36 @@ export default function HomeScreen({navigation}) {
                 <View style={styles.img}>
                     <Image source={require("../assets/Hero image.png")} style={styles.heroImage} />
                 </View>
+                </View>
+                <Searchbar
+                    placeholder="Search"
+                    value={searchText}
+                    onChangeText={setSearchText}
+                    style={[styles.search, {width: width-40}]}
+                    icon={isSearchVisible ? 'close' : 'magnify'}
+                    onIconPress={handleSearchToggle}
+                />
+                
             </View>
+            
         </View>
     )
 }
 
 const styles = StyleSheet.create({
+    constainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#dee3e9'
+    },
+    search: {
+        alignSelf: 'center',
+        marginTop: 30,
+        height: 50,
+        borderRadius: 20,
+        backgroundColor: 'white'
+    },
     hero: {
         width: '100%',
         height: 324,

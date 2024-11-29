@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         textAlign: "center",
-        marginTop: 30,
+        marginTop: 20,
         color: '#495E57',
     },
     input: {
