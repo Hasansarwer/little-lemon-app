@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import { Alert } from 'react-native';
 
 const db = SQLite.openDatabaseSync('littleLemon');
 
@@ -28,15 +29,18 @@ export async function getMenuItems() {
 export async function saveMenuItems(menuItems){
     try{
         db.execAsync( //runAsync
-            'insert into menuitems (uuis, title, price, category) values' + 
+            'insert into menuitems (uuis, title, price, category, image) values' + 
             menuItems.map((item) => `('${item.id}', ${item.name}', ${item.price}', ${item.category}', ${item.image}' )`).join(',')
         );
     } catch (error){
         console.error(error);
+        Alert.alert('Database:', error.message);
     }
 }
 
 export async function filterByQueryAndCategories(query, activeCategories) {
+    Alert.alert(activeCategories);
+    console.log(activeCategories);
     let sql = 'select * from menuitems where title like ?';
     let params = [`%${query}%`];
     if (activeCategories.length) {

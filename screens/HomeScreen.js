@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import { 
     View, 
     Text, 
@@ -6,19 +6,38 @@ import {
     StyleSheet, 
     TouchableOpacity,
     Dimensions,
-    ScrollView,
-    FlatList
+    FlatList,
+    Alert
  } from 'react-native';  
-import { Chip, Icon, Searchbar } from 'react-native-paper';
+import { Chip, Searchbar } from 'react-native-paper';
+import { createTable, filterByQueryAndCategories, getMenuItems, saveMenuItems } from '../database';
+import debounce from 'lodash.debounce';
 
 export default function HomeScreen({navigation}) {
     const [isSearchVisible, setSearchVisible] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [menuItems, setMenuItems] = useState([]);
-    const { width } = Dimensions.get('window');
+    const [query, setQuery] = useState('');
 
     const API_URL = 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
     const categories = ["Starters", "Main", "Desserts", "Drinks"];
+
+    const [filterSelections, setFilterSelections] = useState(
+        categories.map(()=> false)
+      );
+    const { width } = Dimensions.get('window');
+
+    function useUpdateEffect(effect, dependencies = []) {
+        const isInitialMount = useRef(true);
+      
+        useEffect(() => {
+          if (isInitialMount.current) {
+            isInitialMount.current = false;
+          } else {
+            return effect();
+          }
+        }, dependencies);
+    }
 
     const Item = ({name, price, description, image}) => (
         <View style={styles.item}>
@@ -41,15 +60,70 @@ export default function HomeScreen({navigation}) {
         try{
             const response = await fetch(API_URL);
             const json = await response.json();
-            setMenuItems(json.menu);
+            return json.menu;
         }catch(error){
             console.error(error);
+            Alert.alert('Error: ', error.message);
         }
     }
 
     useEffect(()=>{
-            fetchData();
+            (async ()=>{
+                try{
+                    await createTable();
+                    let data = await getMenuItems();
+                    if(!data.length){
+                        data = await fetchData();
+                        saveMenuItems(data);
+                        setMenuItems(data);
+                    }
+                } catch (error){
+                    Alert.alert('Error: ', error.message);
+                }
+            })();
     },[]);
+
+    useUpdateEffect(()=> {
+        (async ()=>{
+          const  activeCategories = categories.filters((s,i)=>{
+            if(filterSelections.every((item)=> item ===false)){
+                return true;
+            }
+            return filterSelections[i];
+          });
+          try{
+            console.log('activeCategories', activeCategories);
+            const data = await filterByQueryAndCategories(
+                query,
+                activeCategories
+            );
+            console.log('data', data);
+            console.log('activeCategories', activeCategories);
+            console.log(data);
+            setMenuItems(data);
+          }catch(error){
+            Alert.alert('Error:', error.messsage)
+          }
+        })();
+    })
+
+    const lookup = useCallback((q) => {
+        setQuery(q);
+      }, []);
+      
+      const debouncedLookup = useMemo(() => debounce(lookup, 500), [lookup]);
+    
+      const handleSearchChange = (text) => {
+        console.log('text: ', text);
+        setSearchText(text);
+        debouncedLookup(text);
+      };
+    
+      const handleFiltersChange = (index) => {
+        const arrayCopy = [...filterSelections];
+        arrayCopy[index] = !filterSelections[index];
+        setFilterSelections(arrayCopy);
+      };
 
     return (
         <View 
@@ -78,7 +152,7 @@ export default function HomeScreen({navigation}) {
                 <Searchbar
                     placeholder="Search"
                     value={searchText}
-                    onChangeText={setSearchText}
+                    onChangeText={handleSearchChange}
                     style={[styles.search, {width: width-40}]}
                     icon={isSearchVisible ? 'close' : 'magnify'}
                     onIconPress={handleSearchToggle}
@@ -91,13 +165,15 @@ export default function HomeScreen({navigation}) {
                 {categories.map((category, index) => (
                     <Chip 
                     key={index} 
+                    onPress={() => handleFiltersChange(index)}
+                    selected={filterSelections[index]}
+                    selectedColor='#F4CE14'
+                    background={filterSelections[index] ? '#F4CE14' : '#495E57'}
                     style={{margin: 8, 
                         alignItems: 'center', 
-                        backgroundColor: 'white', 
                         fontSize: 18, 
-                        color: '#F4CE14'
                     }}>
-                        <Text style={{fontSize:18, color: '#495E57'}}>{category}</Text> </Chip>
+                        <Text style={{fontSize:18, color: filterSelections[index]? '#F4CE14' : '#495E57'}}>{category}</Text> </Chip>
                 ))}
             </View>
             </View>
