@@ -12,13 +12,14 @@ import {
 import { Chip, Searchbar } from 'react-native-paper';
 import { createTable, filterByQueryAndCategories, getMenuItems, saveMenuItems } from '../database';
 import debounce from 'lodash.debounce';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen({navigation}) {
     const [isSearchVisible, setSearchVisible] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [menuItems, setMenuItems] = useState([]);
     const [query, setQuery] = useState('');
-
+    const [avatar, setAvatar] = useState(require("../assets/Profile.png"));
     const API_URL = 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
     const categories = ["Starters", "Mains", "Desserts", "Drinks"];
 
@@ -70,6 +71,10 @@ export default function HomeScreen({navigation}) {
     useEffect(()=>{
             (async ()=>{
                 try{
+                    const profileInfo = await AsyncStorage.getItem('profileInfo');
+                    if(profileInfo){
+                        setAvatar(JSON.parse(profileInfo).imgSrc);
+                    }
                     await createTable();
                     let data = await getMenuItems();
                     if(!data.length){
@@ -130,7 +135,7 @@ export default function HomeScreen({navigation}) {
                 <View style={{ width: 60, height: 60 }}></View>
                     <Image source={require("../assets/Logo.png")} style={{ width: 185, height: 44 }} />
                     <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-                        <Image source={require("../assets/Profile.png")} style={{ width: 60, height: 60 }} />
+                        <Image source={avatar} style={{ width: 60, height: 60 }} />
                     </TouchableOpacity>
             </View>
             <View style={styles.hero}>

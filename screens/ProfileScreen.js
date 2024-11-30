@@ -1,13 +1,13 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';  
 import { Checkbox } from 'react-native-paper';
 import { MaskedTextInput } from "react-native-mask-text";
-import Avatar from '../component/Avatar';
+import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import Avatar from '../component/Avatar';
 export default function ProfileScreen({ navigation, logOut}) {
-    const [profileInfo, setProfileInfo] = React.useState({
-        avatar: 'Profile.png',
+    const [profileInfo, setProfileInfo] = useState({
+        imgSrc: require("../assets/Profile.png"),
         firstName: "",
         lastName: "",
         email: "",
@@ -36,7 +36,26 @@ export default function ProfileScreen({ navigation, logOut}) {
         }
     }
 
-    console.log(profileInfo);
+    const pickImage = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ['images'],
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 1,
+            });
+            if(!result.cancelled) {
+                console.log(result);
+                setProfileInfo({
+                    ...profileInfo,
+                    imgSrc: {uri: result.assets[0].uri}
+                });
+            }
+        } catch (error) {
+            Alert.alert('Error', error.message);
+        }
+    }
+
     function updateProfileInfo(key, value) {
         setProfileInfo({
             ...profileInfo,
@@ -74,14 +93,17 @@ export default function ProfileScreen({ navigation, logOut}) {
                 <View style={{ width: 60, height: 60 }}></View>
                     <Image source={require("../assets/Logo.png")} style={{ width: 185, height: 44 }} />
                     <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-                        <Image source={require("../assets/Profile.png")} style={{ width: 60, height: 60 }} />
+                        <Image source={profileInfo.imgSrc} style={{ width: 60, height: 60 }} />
                     </TouchableOpacity>
             </View>
             <Text style={styles.title}>Avatar </Text>
             <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingLeft:20}}>
                 {/* <Image source={require("../assets/avatar.png")} style={{ width: 100, height: 100, borderRadius: 50, margin: 20 }} /> */}
-                <Avatar  firstName={profileInfo?.firstName} lastName={profileInfo?.lastName} big={true} />
-                <TouchableOpacity style={{backgroundColor: "olive", borderColor: "yellow", padding: 10, borderRadius: 5, margin: 20}}>
+                <Avatar avatar={profileInfo.imgSrc} firstName={profileInfo?.firstName} lastName={profileInfo?.lastName} big={true} />
+                <TouchableOpacity 
+                    style={{backgroundColor: "olive", borderColor: "yellow", padding: 10, borderRadius: 5, margin: 20}}
+                    onPress={pickImage}
+                >
                     <Text style={{textAlign: 'center', color: 'white'}}>Change</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ borderColor: "olive", padding: 10, margin: 20, borderWidth: 1}}>

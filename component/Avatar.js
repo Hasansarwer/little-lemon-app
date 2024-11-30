@@ -9,7 +9,7 @@ export default function Avatar({avatar, firstName, lastName, big}) {
     }
         return(
             <View style={big ? styles.avatarContainer : styles.avatarContainerSmall}>
-                <Image source={require("../assets/Profile.png")} style = {styles.avatarImage} />
+                <Image source={avatar} style = {styles.avatarImage} />
             </View>
         );
     
