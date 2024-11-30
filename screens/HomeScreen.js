@@ -20,7 +20,7 @@ export default function HomeScreen({navigation}) {
     const [query, setQuery] = useState('');
 
     const API_URL = 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
-    const categories = ["Starters", "Main", "Desserts", "Drinks"];
+    const categories = ["Starters", "Mains", "Desserts", "Drinks"];
 
     const [filterSelections, setFilterSelections] = useState(
         categories.map(()=> false)
@@ -75,8 +75,8 @@ export default function HomeScreen({navigation}) {
                     if(!data.length){
                         data = await fetchData();
                         saveMenuItems(data);
-                        setMenuItems(data);
                     }
+                    setMenuItems(data);
                 } catch (error){
                     Alert.alert('Error: ', error.message);
                 }
@@ -85,27 +85,23 @@ export default function HomeScreen({navigation}) {
 
     useUpdateEffect(()=> {
         (async ()=>{
-          const  activeCategories = categories.filters((s,i)=>{
+          const  activeCategories = categories.filter((s,i)=>{
             if(filterSelections.every((item)=> item ===false)){
                 return true;
             }
             return filterSelections[i];
           });
           try{
-            console.log('activeCategories', activeCategories);
             const data = await filterByQueryAndCategories(
                 query,
                 activeCategories
             );
-            console.log('data', data);
-            console.log('activeCategories', activeCategories);
-            console.log(data);
             setMenuItems(data);
           }catch(error){
-            Alert.alert('Error:', error.messsage)
+            Alert.alert('Error:', error.message)
           }
         })();
-    })
+    }, [filterSelections, query]);
 
     const lookup = useCallback((q) => {
         setQuery(q);
@@ -114,7 +110,6 @@ export default function HomeScreen({navigation}) {
       const debouncedLookup = useMemo(() => debounce(lookup, 500), [lookup]);
     
       const handleSearchChange = (text) => {
-        console.log('text: ', text);
         setSearchText(text);
         debouncedLookup(text);
       };
@@ -159,8 +154,10 @@ export default function HomeScreen({navigation}) {
                 />
                 
             </View>
-            <View style={{borderBottomWidth: 2, borderColor: 'white', paddingBottom: 20}}>
+            <View style={{borderBottomWidth: 2, borderColor: 'white', paddingBottom: 20, width :"100%"}}>
+                <View>
             <Text style={styles.categoryTitle}>ORDER FOR DELIVERY!</Text>
+            </View>
             <View style={styles.categoryContainer}>
                 {categories.map((category, index) => (
                     <Chip 
