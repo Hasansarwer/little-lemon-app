@@ -6,6 +6,7 @@ import Onboarding from '../screens/onboarding';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SplashScreen from '../screens/SplashScreen';
+import { dropTable } from '../database';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +40,8 @@ export default function RootNavigator() {
         await AsyncStorage.removeItem('onboardingComplete');
         await AsyncStorage.removeItem('name');
         await AsyncStorage.removeItem('email');
+        await AsyncStorage.removeItem('profileInfo');
+        await dropTable();
         setIsOnboarded(false);
         navigation.dispatch(
             CommonActions.reset({

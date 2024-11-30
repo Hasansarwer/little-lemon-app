@@ -7,22 +7,13 @@ export default function Avatar({avatar, firstName, lastName, big}) {
         if(firstName?.lenth>0) return firstName[0].toUpperCase();
         if(lastName?.length>0) return lastName[0].toUpperCase();
     }
-
-    if(avatar) {
         return(
             <View style={big ? styles.avatarContainer : styles.avatarContainerSmall}>
-                <Image source={{ uri: avatar }} style = {styles.avatarImage} />
+                <Image source={require("../assets/Profile.png")} style = {styles.avatarImage} />
             </View>
         );
-    }
-
-    const initials = getInitials(firstName, lastName);
     
-    return (
-        <View style={big? styles.avatarContainer: styles.avatarContainerSmall}>
-            <Text style = { big? styles.avatarText : styles.avatarTextSmall}>{initials}</Text>
-        </View>
-    );
+
 };
 
 const styles = StyleSheet.create({

@@ -1,44 +1,86 @@
-import * as React from 'react';
+import React, {useEffect} from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';  
 import { Checkbox } from 'react-native-paper';
 import { MaskedTextInput } from "react-native-mask-text";
 import Avatar from '../component/Avatar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function ProfileScreen({name, email, logOut}) {
+export default function ProfileScreen({ navigation, logOut}) {
     const [profileInfo, setProfileInfo] = React.useState({
-        avatar: null,
-        firstName: null,
-        lastName: null,
-        email: email,
-        phone: '',
+        avatar: 'Profile.png',
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
         orderStatus: false,
         newsLetter: false,
         passwordChange: false,
         specialOffers: false
     });
 
+    const saveChanges = async () => {
+        try {
+            await AsyncStorage.setItem('profileInfo', JSON.stringify(profileInfo));
+            Alert.alert('Success', 'Profile updated successfully');
+        } catch (error) {
+            Alert.alert('Error', error.message);
+        }
+    }
+
+    const discardChanges = async () => {
+        try {
+            const profile = await AsyncStorage.getItem('profileInfo');
+            setProfileInfo(JSON.parse(profile));
+        } catch (error) {
+            Alert.alert('Error', error.message);
+        }
+    }
+
+    console.log(profileInfo);
     function updateProfileInfo(key, value) {
         setProfileInfo({
             ...profileInfo,
             [key]: value
         });
     }
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const profile = await AsyncStorage.getItem('profileInfo');
+                if(profile) {
+                    setProfileInfo(JSON.parse(profile));
+                }else {
+                    const name = await AsyncStorage.getItem('name');
+                    const email = await AsyncStorage.getItem('email');
+                    setProfileInfo({
+                        ...profileInfo,
+                        firstName: name,
+                        email: email
+                    });
+                }
+            } catch (error) {
+                Alert.alert('Error', error.message);
+            }
+        })();
+    }, []);
+    
     return (
         <ScrollView 
             contentContainerStyle ={styles.container}
             showsVerticalScrollIndicator={false}
         >
-            <View style={{width: '100%', height: 68, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#dee3e9', paddingTop:20, paddingHorizontal: 10}}>
-                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                    <Image source={require("../assets/little-lemon-logo-grey.png")} style={{ width: 30, height: 36 }} />
-                    <Text style={{fontSize: 20, padding: 10}}>LITTLE LEMON</Text>
-                </View>
-                <Avatar avatar={profileInfo?.avatar} firstName={profileInfo?.firstName} lastName={profileInfo?.lastName} big={false} />
+            <View style={{height: 100, width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", backgroundColor: "white", paddingTop: 20 }}>
+                <View style={{ width: 60, height: 60 }}></View>
+                    <Image source={require("../assets/Logo.png")} style={{ width: 185, height: 44 }} />
+                    <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+                        <Image source={require("../assets/Profile.png")} style={{ width: 60, height: 60 }} />
+                    </TouchableOpacity>
             </View>
             <Text style={styles.title}>Avatar </Text>
             <View style={{width: '100%', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingLeft:20}}>
                 {/* <Image source={require("../assets/avatar.png")} style={{ width: 100, height: 100, borderRadius: 50, margin: 20 }} /> */}
-                <Avatar avatar={profileInfo?.avatar} firstName={profileInfo?.firstName} lastName={profileInfo?.lastName} big={true} />
+                <Avatar  firstName={profileInfo?.firstName} lastName={profileInfo?.lastName} big={true} />
                 <TouchableOpacity style={{backgroundColor: "olive", borderColor: "yellow", padding: 10, borderRadius: 5, margin: 20}}>
                     <Text style={{textAlign: 'center', color: 'white'}}>Change</Text>
                 </TouchableOpacity>
@@ -69,7 +111,7 @@ export default function ProfileScreen({name, email, logOut}) {
 
             <Text style={styles.title}>Phone </Text>
             <MaskedTextInput 
-                mask='(+880) 999-999999'
+                mask='(999) 999-9999'
                 value={profileInfo.phone}
                 onChangeText={(text) => updateProfileInfo('phone', text)}
                 style={styles.input}
@@ -116,12 +158,18 @@ export default function ProfileScreen({name, email, logOut}) {
             </View>
             <View style={{width: '100%', flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View style={{width: '50%'}}>
-                    <TouchableOpacity style={{backgroundColor: "#fff", margin: 20, borderColor: "olive", padding: 10, borderRadius: 5, marginTop: 20}}>
+                    <TouchableOpacity 
+                        style={{backgroundColor: "#fff", margin: 20, borderColor: "olive", padding: 10, borderRadius: 5, marginTop: 20}}
+                        onPress={discardChanges}
+                        >
                         <Text style={{textAlign: 'center'}}>Discard changes</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{width: '50%'}}>
-                    <TouchableOpacity style={{backgroundColor: "olive", padding: 10, borderRadius: 5, margin: 20}}>
+                    <TouchableOpacity 
+                    style={{backgroundColor: "olive", padding: 10, borderRadius: 5, margin: 20}}
+                    onPress={saveChanges}
+                    >
                         <Text style={{textAlign: 'center', color: 'white'}}>Save changes</Text>
                     </TouchableOpacity>
                 </View>

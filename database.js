@@ -5,6 +5,15 @@ const db = SQLite.openDatabaseSync('littleLemon');
 
 // create table if not exists
 
+export async function dropTable() {
+    await db.execAsync(
+        `drop table if exists menuitems;`
+    ).catch((error) => {
+        console.error(error);
+        Alert.alert('Database:', error.message);
+    });
+}
+
 export async function createTable(){
     // await db.execAsync(
     //     ` drop table if exists menuitems;`
