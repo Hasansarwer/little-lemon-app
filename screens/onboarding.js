@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#EDEFEE'
     },
     header: {
-        height: 100,
+        height: 80,
         width: "100%",
         flexDirection: "row",
         justifyContent: "center",
@@ -137,7 +137,8 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: "#cbd2d9",
-        margin: 30,
+        margin: 10,
+        marginEnd: 30,
         paddingHorizontal: 20,
         paddingVertical: 10,
         borderRadius: 5,
