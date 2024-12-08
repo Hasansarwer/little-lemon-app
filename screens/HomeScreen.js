@@ -20,6 +20,7 @@ export default function HomeScreen({navigation}) {
     const [menuItems, setMenuItems] = useState([]);
     const [query, setQuery] = useState('');
     const [avatar, setAvatar] = useState(require("../assets/Profile.png"));
+    const [isImageLoaded, setIsImageLoaded] = useState(false);
     const API_URL = 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
     const categories = ["Starters", "Mains", "Desserts", "Drinks"];
 
@@ -67,6 +68,24 @@ export default function HomeScreen({navigation}) {
             Alert.alert('Error: ', error.message);
         }
     }
+
+    useEffect(()=>{
+        (async()=>{
+            if(!isImageLoaded){
+                try{
+                    const profileInfo = await AsyncStorage.getItem('profileInfo');
+                    if(profileInfo){
+                        setAvatar(JSON.parse(profileInfo).imgSrc);
+                    }
+                    setIsImageLoaded(true);
+                }catch(error){
+                    Alert.alert('Error: ', error.message);
+                }
+            }
+        }
+        )();
+    }
+    ,[isImageLoaded]);
 
     useEffect(()=>{
             (async ()=>{
@@ -131,7 +150,7 @@ export default function HomeScreen({navigation}) {
         // showsVerticalScrollIndicator={false}
         >
             
-            <View style={{height: 100, width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", backgroundColor: "white", paddingTop: 20 }}>
+            <View style={{height: 90, width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", backgroundColor: "white", paddingTop: 20 }}>
                 <View style={{ width: 60, height: 60 }}></View>
                     <Image source={require("../assets/Logo.png")} style={{ width: 185, height: 44 }} />
                     <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
@@ -159,7 +178,7 @@ export default function HomeScreen({navigation}) {
                 />
                 
             </View>
-            <View style={{borderBottomWidth: 2, borderColor: 'white', paddingBottom: 20, width :"100%"}}>
+            <View style={{borderBottomWidth: 2, borderColor: 'white', paddingBottom: 10, width :"100%"}}>
                 <View>
             <Text style={styles.categoryTitle}>ORDER FOR DELIVERY!</Text>
             </View>
@@ -262,7 +281,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         fontSize: 24,
         fontWeight: 'bold',
-        marginTop: 20,
+        marginTop: 10,
         marginLeft: 20
     },
     paragraph: {
@@ -282,5 +301,11 @@ const styles = StyleSheet.create({
         width: 160,
         height: 170,
         marginTop: 0,
+    },
+    imgContainer: {
+        width: 100,
+        height: 100,
+        borderRadius: 10,
+        overflow: 'hidden',
     }
 })
