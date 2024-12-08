@@ -138,6 +138,7 @@ export default function ProfileScreen({ navigation, logOut}) {
                 onChangeText={(text) => updateProfileInfo('phone', text)}
                 style={styles.input}
                 keyboardType='numeric'
+                placeholder='(123) 456-7890'
             />
 
             <Text style={styles.title}>Email notifications </Text>
@@ -220,6 +221,7 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderWidth: 1,
         borderRadius: 10,
+        paddingLeft: 10,
     },
     Checkbox: {
         flexDirection: 'row',
